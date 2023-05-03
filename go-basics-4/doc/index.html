@@ -1,0 +1,88 @@
+<html><head></head><body><h1>Instructions</h1>
+
+<p>Parse and evaluate simple math word problems returning the answer as
+an integer.</p>
+
+<h2>Iteration 0 — Numbers</h2>
+
+<p>Problems with no operations simply evaluate to the number given.</p>
+
+<blockquote>
+<p>What is 5?</p>
+</blockquote>
+
+<p>Evaluates to 5.</p>
+
+<h2>Iteration 1 — Addition</h2>
+
+<p>Add two numbers together.</p>
+
+<blockquote>
+<p>What is 5 plus 13?</p>
+</blockquote>
+
+<p>Evaluates to 18.</p>
+
+<p>Handle large numbers and negative numbers.</p>
+
+<h2>Iteration 2 — Subtraction, Multiplication and Division</h2>
+
+<p>Now, perform the other three operations.</p>
+
+<blockquote>
+<p>What is 7 minus 5?</p>
+</blockquote>
+
+<p>2</p>
+
+<blockquote>
+<p>What is 6 multiplied by 4?</p>
+</blockquote>
+
+<p>24</p>
+
+<blockquote>
+<p>What is 25 divided by 5?</p>
+</blockquote>
+
+<p>5</p>
+
+<h2>Iteration 3 — Multiple Operations</h2>
+
+<p>Handle a set of operations, in sequence.</p>
+
+<p>Since these are verbal word problems, evaluate the expression from
+left-to-right, <em>ignoring the typical order of operations.</em></p>
+
+<blockquote>
+<p>What is 5 plus 13 plus 6?</p>
+</blockquote>
+
+<p>24</p>
+
+<blockquote>
+<p>What is 3 plus 2 multiplied by 3?</p>
+</blockquote>
+
+<p>15  (i.e. not 9)</p>
+
+<h2>Iteration 4 — Errors</h2>
+
+<p>The parser should reject:</p>
+
+<ul>
+<li>Unsupported operations (&#34;What is 52 cubed?&#34;)</li>
+<li>Non-math questions (&#34;Who is the President of the United States&#34;)</li>
+<li>Word problems with invalid syntax (&#34;What is 1 plus plus 2?&#34;)</li>
+</ul>
+
+<h2>Bonus — Exponentials</h2>
+
+<p>If you&#39;d like, handle exponentials.</p>
+
+<blockquote>
+<p>What is 2 raised to the 5th power?</p>
+</blockquote>
+
+<p>32</p>
+</body></html>

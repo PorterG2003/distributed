@@ -1,0 +1,27 @@
+<html><head></head><body><h1>Instructions</h1>
+
+<p>Your task is to convert a number into a string that contains
+raindrop sounds corresponding to certain potential factors. A factor
+is a number that evenly divides into another number, leaving no
+remainder. The simplest way to test if one number is a factor of
+another is to use the <a href="https://en.wikipedia.org/wiki/Modulo_operation">modulo
+operation</a>.</p>
+
+<p>The rules of <code>raindrops</code> are that if a given number:</p>
+
+<ul>
+<li>has 3 as a factor, add &#39;Pling&#39; to the result.</li>
+<li>has 5 as a factor, add &#39;Plang&#39; to the result.</li>
+<li>has 7 as a factor, add &#39;Plong&#39; to the result.</li>
+<li><em>does not</em> have any of 3, 5, or 7 as a factor, the result should
+be the digits of the number.</li>
+</ul>
+
+<h2>Examples</h2>
+
+<ul>
+<li>28 has 7 as a factor, but not 3 or 5, so the result would be &#34;Plong&#34;.</li>
+<li>30 has both 3 and 5 as factors, but not 7, so the result would be &#34;PlingPlang&#34;.</li>
+<li>34 is not factored by 3, 5, or 7, so the result would be &#34;34&#34;.</li>
+</ul>
+</body></html>

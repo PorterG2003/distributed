@@ -1,0 +1,26 @@
+--> initialized 3 nodes
+--> sent prepare requests to all nodes from 3 with sequence 5003
+--> prepare request from 3 sequence 5003 accepted by 2 with no value
+--> prepare request from 3 sequence 5003 accepted by 3 with no value
+--> prepare request from 3 sequence 5003 accepted by 1 with no value
+--> positive prepare response from 2 sequence 5003 recorded by 3 with no value
+--> prepare response from 2 sequence 5003 ignored as a duplicate by 3
+--> positive prepare response from 3 sequence 5003 recorded by 3 with no value
+--> prepare round successful: 3 proposing its own value 33333
+--> sent accept requests to all nodes from 3 with value 33333 sequence 5003
+--> positive prepare response from 1 sequence 5003 recorded by 3 with no value
+--> valid prepare vote ignored by 3 because round is already resolved
+--> accept request from 3 with value 33333 sequence 5003 accepted by 3
+--> accept request from 3 with value 33333 sequence 5003 accepted by 1
+--> note: consensus has been achieved
+--> accept request from 3 with value 33333 sequence 5003 accepted by 2
+--> prepare response from 3 sequence 5003 ignored as a duplicate by 3
+--> positive accept response from 3 sequence 5003 recorded by 3
+--> positive accept response from 1 sequence 5003 recorded by 3
+--> accept round successful: 3 detected consensus with value 33333
+--> sent decide requests to all nodes from 3 with value 33333
+--> positive accept response from 2 sequence 5003 recorded by 3
+--> valid accept vote ignored by 3 because round is already resolved
+--> recording consensus value 33333 at 1
+--> recording consensus value 33333 at 2
+--> recording consensus value 33333 at 3

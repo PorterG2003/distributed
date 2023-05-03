@@ -1,0 +1,89 @@
+--> initialized 5 nodes
+--> sent prepare requests to all nodes from 1 with sequence 5001
+--> prepare request from 1 sequence 5001 accepted by 1 with no value
+--> prepare request from 1 sequence 5001 accepted by 2 with no value
+--> prepare request from 1 sequence 5001 accepted by 3 with no value
+--> prepare request from 1 sequence 5001 accepted by 4 with no value
+--> prepare request from 1 sequence 5001 accepted by 5 with no value
+--> sent prepare requests to all nodes from 2 with sequence 5002
+--> prepare request from 2 sequence 5002 accepted by 1 with no value
+--> prepare request from 2 sequence 5002 accepted by 2 with no value
+--> prepare request from 2 sequence 5002 accepted by 3 with no value
+--> prepare request from 2 sequence 5002 accepted by 4 with no value
+--> prepare request from 2 sequence 5002 accepted by 5 with no value
+--> positive prepare response from 1 sequence 5001 recorded by 1 with no value
+--> positive prepare response from 2 sequence 5001 recorded by 1 with no value
+--> positive prepare response from 3 sequence 5001 recorded by 1 with no value
+--> prepare round successful: 1 proposing its own value 11111
+--> sent accept requests to all nodes from 1 with value 11111 sequence 5001
+--> positive prepare response from 4 sequence 5001 recorded by 1 with no value
+--> valid prepare vote ignored by 1 because round is already resolved
+--> positive prepare response from 5 sequence 5001 recorded by 1 with no value
+--> valid prepare vote ignored by 1 because round is already resolved
+--> accept request from 1 with value 11111 sequence 5001 rejected by 1
+--> accept request from 1 with value 11111 sequence 5001 rejected by 2
+--> accept request from 1 with value 11111 sequence 5001 rejected by 3
+--> accept request from 1 with value 11111 sequence 5001 rejected by 4
+--> accept request from 1 with value 11111 sequence 5001 rejected by 5
+--> negative accept response from 1 sequence 5001 recorded by 1
+--> negative accept response from 2 sequence 5001 recorded by 1
+--> negative accept response from 3 sequence 5001 recorded by 1
+--> accept round failed at 1, restarting
+--> sent prepare requests to all nodes from 1 with sequence 5011
+--> accept response from 4 sequence 5001 from the past ignored by 1
+--> accept response from 5 sequence 5001 from the past ignored by 1
+--> positive prepare response from 1 sequence 5002 recorded by 2 with no value
+--> positive prepare response from 2 sequence 5002 recorded by 2 with no value
+--> positive prepare response from 3 sequence 5002 recorded by 2 with no value
+--> prepare round successful: 2 proposing its own value 22222
+--> sent accept requests to all nodes from 2 with value 22222 sequence 5002
+--> positive prepare response from 4 sequence 5002 recorded by 2 with no value
+--> valid prepare vote ignored by 2 because round is already resolved
+--> positive prepare response from 5 sequence 5002 recorded by 2 with no value
+--> valid prepare vote ignored by 2 because round is already resolved
+--> prepare request from 1 sequence 5011 accepted by 1 with no value
+--> prepare request from 1 sequence 5011 accepted by 2 with no value
+--> prepare request from 1 sequence 5011 accepted by 3 with no value
+--> prepare request from 1 sequence 5011 accepted by 4 with no value
+--> prepare request from 1 sequence 5011 accepted by 5 with no value
+--> accept request from 2 with value 22222 sequence 5002 rejected by 1
+--> accept request from 2 with value 22222 sequence 5002 rejected by 2
+--> accept request from 2 with value 22222 sequence 5002 rejected by 3
+--> accept request from 2 with value 22222 sequence 5002 rejected by 4
+--> accept request from 2 with value 22222 sequence 5002 rejected by 5
+--> negative accept response from 1 sequence 5002 recorded by 2
+--> negative accept response from 2 sequence 5002 recorded by 2
+--> negative accept response from 3 sequence 5002 recorded by 2
+--> accept round failed at 2, restarting
+--> sent prepare requests to all nodes from 2 with sequence 5012
+--> accept response from 4 sequence 5002 from the past ignored by 2
+--> accept response from 5 sequence 5002 from the past ignored by 2
+--> positive prepare response from 1 sequence 5011 recorded by 1 with no value
+--> positive prepare response from 2 sequence 5011 recorded by 1 with no value
+--> positive prepare response from 3 sequence 5011 recorded by 1 with no value
+--> prepare round successful: 1 proposing its own value 11111
+--> sent accept requests to all nodes from 1 with value 11111 sequence 5011
+--> positive prepare response from 4 sequence 5011 recorded by 1 with no value
+--> valid prepare vote ignored by 1 because round is already resolved
+--> positive prepare response from 5 sequence 5011 recorded by 1 with no value
+--> valid prepare vote ignored by 1 because round is already resolved
+--> accept request from 1 with value 11111 sequence 5011 accepted by 1
+--> accept request from 1 with value 11111 sequence 5011 accepted by 2
+--> accept request from 1 with value 11111 sequence 5011 accepted by 3
+--> note: consensus has been achieved
+--> accept request from 1 with value 11111 sequence 5011 accepted by 4
+--> accept request from 1 with value 11111 sequence 5011 accepted by 5
+--> positive accept response from 1 sequence 5011 recorded by 1
+--> positive accept response from 2 sequence 5011 recorded by 1
+--> positive accept response from 3 sequence 5011 recorded by 1
+--> accept round successful: 1 detected consensus with value 11111
+--> sent decide requests to all nodes from 1 with value 11111
+--> positive accept response from 4 sequence 5011 recorded by 1
+--> valid accept vote ignored by 1 because round is already resolved
+--> positive accept response from 5 sequence 5011 recorded by 1
+--> valid accept vote ignored by 1 because round is already resolved
+--> recording consensus value 11111 at 1
+--> recording consensus value 11111 at 2
+--> recording consensus value 11111 at 3
+--> recording consensus value 11111 at 4
+--> recording consensus value 11111 at 5

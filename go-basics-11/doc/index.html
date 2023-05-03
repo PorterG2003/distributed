@@ -1,0 +1,232 @@
+<html><head></head><body><h1>Introduction</h1>
+
+<h2>Interfaces</h2>
+
+<p>An <strong>interface type</strong> is effectively a set of method signatures. Any
+type that defines those methods &#34;implements&#34; the interface
+implicitly. There is no <code>implements</code> keyword in Go. Here is what an
+interface definition might look like:</p>
+
+<pre><code class="language-go">type InterfaceName interface {
+    MethodOne() MethodOneReturnType
+    MethodTwo(paramOne ParamOneType, paramTwo ParamTwoType) MethodTwoReturnType
+    ...
+}
+</code></pre>
+
+<p>For example, here is the built-in <code>error</code> interface:</p>
+
+<pre><code class="language-go">type error interface {
+    Error() string
+}
+</code></pre>
+
+<p>This means that any type which implements an <code>Error()</code> method which
+returns a <code>string</code> implements the <code>error</code> interface. This allows a
+function with return type <code>error</code> to return values of different
+types as long as all of them satisfy the <code>error</code> interface.</p>
+
+<p>There is one very special interface type in Go: the <strong>empty
+interface</strong> type that contains zero methods. The empty interface
+type is written like this: <code>interface{}</code>. Since it has no methods,
+every type implements the empty interface type. This is helpful for
+defining a function that can generically accept any value. In that
+case, the function parameter uses the empty interface type.</p>
+
+<h2>Errors</h2>
+
+<p>Error handling is <strong>not</strong> done via exceptions in Go. Instead, errors
+are normal values of the interface type <code>error</code>.</p>
+
+<h3>Creating and Returning Errors</h3>
+
+<p>You do not have to always implement the error interface yourself. To
+create a simple error, you can use the <code>errors.New()</code> function that
+is part of the standard library package <code>errors</code>. These error
+variables are also called <em>sentinel errors</em> and by convention their
+names should start with <code>Err</code> or <code>err</code> (depending on whether they
+are exported or not). You should use error variables instead of
+directly writing <code>errors.New</code> in cases where you use an error
+multiple times or where you want the consumer of your package to be
+able to check for the specific error.</p>
+
+<pre><code class="language-go">import &#34;errors&#34;
+
+var ErrSomethingWrong = errors.New(&#34;something went wrong&#34;)
+ErrSomethingWrong.Error() // returns &#34;something went wrong&#34;
+</code></pre>
+
+<p>An error is by convention the last value returned in a function with
+multiple return values. If the function returns an error, it should
+always return the zero value for other returned values:</p>
+
+<pre><code class="language-go">import &#34;errors&#34;
+
+// Do this:
+func GoodFoo() (int, error) {
+  return 0, errors.New(&#34;Error&#34;)
+}
+
+// Not this:
+func BadFoo() (int, error) {
+  return 10, errors.New(&#34;Error&#34;)
+}
+</code></pre>
+
+<p>Return <code>nil</code> for the error when there are no errors:</p>
+
+<pre><code class="language-go">func Foo() (int, error) {
+  return 10, nil
+}
+</code></pre>
+
+<h3>Custom Error Types</h3>
+
+<p>If you want your error to include more information than just the
+error message string, you can create a custom error type. As
+mentioned before, everything that implements the <code>error</code> interface
+(i.e. has an <code>Error() string</code> method) can serve as an error in Go.</p>
+
+<p>Usually, a struct is used to create a custom error type. By
+convention, custom error type names should end with <code>Error</code>. Also,
+it is best to set up the <code>Error() string</code> method with a pointer
+receiver, see this <a href="https://stackoverflow.com/a/50333850">Stackoverflow comment</a> to
+learn about the reasoning. Note that this means you need to return a
+pointer to your custom error otherwise it will not count as <code>error</code>
+because the non-pointer value does not provide the <code>Error() string</code>
+method.</p>
+
+<pre><code class="language-go">type MyCustomError struct {
+  message string
+  details string
+}
+
+func (e *MyCustomError) Error() string {
+  return fmt.Sprintf(&#34;%s, Details: %s&#34;, e.message, e.details)
+}
+
+func someFunction() error {
+  // ...
+  return &amp;MyCustomError{
+    message: &#34;...&#34;,
+    details: &#34;...&#34;,
+  }
+}
+</code></pre>
+
+<h3>Checking for Errors</h3>
+
+<p>Errors can be checked against <code>nil</code>. It is recommended to return
+early in case of an error to avoid nesting the &#34;happy path&#34; of your
+code.</p>
+
+<pre><code class="language-go">func myFunc() error {
+	file, err := os.Open(&#34;./users.csv&#34;)
+	if err != nil {
+		// handle the error
+		return err // or e.g. log it and continue
+	}
+	// do something with file
+}
+</code></pre>
+
+<p>Since most functions in Go include an error as one of the return
+values, you will see/use this <code>if err != nil</code> pattern all over the
+place in Go code.</p>
+
+<p>You can compare error variables with the equality operator <code>==</code>:</p>
+
+<pre><code class="language-go">var ErrResourceNotFound = errors.New(&#34;resource not found&#34;)
+// ...
+if err == ErrResourceNotFound {
+  // do something about the resource-not-found error
+}
+</code></pre>
+
+<p>How to check for errors of a specific custom error type will be
+covered in later concepts.</p>
+
+<h1>Instructions</h1>
+
+<p>The day you waited so long finally came and you are now the proud
+owner of a beautiful farm in the Alps.</p>
+
+<p>You still do not like to wake up too early in the morning to feed
+your cows and because you are an excellent engineer, you build a
+food dispenser, the <code>FEED-M-ALL</code>.</p>
+
+<p>The last thing required in order to finish your project, is a piece
+of code that, given the number of cows and the amount of fodder for
+the day, does a division so each cow has the same quantity: you need
+to avoid conflicts, cows are very sensitive.</p>
+
+<p>Depending on the day, some cows prefer to eat fresh grass instead of
+fodder, sometime no cows at all want to eat fodder.
+While this is good for your pocket, you want to catch the division by zero returning an error.</p>
+
+<p>Also, your silly nephew (who has just learned about negative
+numbers) sometimes will say that there are a negative number of
+cows. You love your nephew so you want to return a helpful error
+when he does that.</p>
+
+<h2>1. Get the amount of fodder from the <code>FodderAmount</code> method</h2>
+
+<p>You will be passed a value that fulfills the <code>WeightFodder</code>
+interface. <code>WeightFodder</code> includes a method called <code>FodderAmount</code>
+that returns the amount of fodder available and possibly an error.</p>
+
+<pre><code class="language-go">// twentyFodderNoError says there are 20.0 fodder
+fodder, err := DivideFood(twentyFodderNoError, 10)
+// fodder == 2.0
+// err == nil
+</code></pre>
+
+<p>If <code>ErrScaleMalfunction</code> is returned by <code>FodderAmount</code> and the
+fodder amount is positive, double the fodder amount returned by
+<code>FodderAmount</code> before dividing it equally between the cows. For any
+other error, return <code>0</code> and the error.</p>
+
+<pre><code class="language-go">// twentyFodderWithErrScaleMalfunction says there are 20.0 fodder and a ErrScaleMalfunction
+fodder, err := DivideFood(twentyFodderWithErrScaleMalfunction, 10)
+// fodder == 4.0
+// err == nil
+</code></pre>
+
+<h2>2. Return an error for negative fodder</h2>
+
+<p>If the scale is broken and returning negative amounts of fodder,
+return an error saying &#34;negative fodder&#34;:</p>
+
+<pre><code class="language-go">// negativeFiveFodder says there are -5.0 fodder
+fodder, err := DivideFood(negativeFiveFodder, 10)
+// fodder == 0.0
+// err.Error() == &#34;negative fodder&#34;
+</code></pre>
+
+<h2>3. Prevent division by zero</h2>
+
+<p>After getting the fodder amount from <code>weightFodder</code>, prevent a
+division by zero when there are no cows at all by returning an error
+saying &#34;division by zero&#34;:</p>
+
+<pre><code class="language-go">// twentyFodderNoError says there are 20.0 fodder
+fodder, err := DivideFood(twentyFodderNoError, 0)
+// fodder == 0.0
+// err.Error() == &#34;division by zero&#34;
+</code></pre>
+
+<h2>4. Handle negative cows</h2>
+
+<p>Define a custom error type called <code>SillyNephewError</code>. It should be
+returned in case the number of cows is negative.</p>
+
+<p>The error message should include the number of cows that was passed
+as argument. You can see the format of the error message in the
+example below.</p>
+
+<pre><code class="language-go">// twentyFodderNoError says there are 20.0 fodder
+fodder, err := DivideFood(twentyFodderNoError, -5)
+// fodder == 0.0
+// err.Error() == &#34;silly nephew, there cannot be -5 cows&#34;
+</code></pre>
+</body></html>

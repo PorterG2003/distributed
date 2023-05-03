@@ -1,0 +1,237 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuites tests="3" failures="3" disabled="0" skipped="0" errors="0" time="0.016693830490112305"><testsuite tests="3" failures="3" disabled="0" skipped="0" errors="0" time="0.016693830490112305"><testcase name="inputs/1-simple-single-proposer.input" time="0.011994123458862305" status="failed"><failure type="failure">./a.out &lt; inputs/1-simple-single-proposer.input
+
+!!! output is incorrect:
+diff inputs/1-simple-single-proposer.actual inputs/1-simple-single-proposer.expected8a9,10
+&gt; --&gt; prepare round successful: 3 proposing its own value 33333
+&gt; --&gt; sent accept requests to all nodes from 3 with value 33333 sequence 5003
+10,14c12,26
+&lt; --&gt; sent accept requests to all nodes from 3 with value 0 sequence 5003
+&lt; --&gt; sent accept requests to all nodes from 3 with value 0 sequence 5003
+&lt; --&gt; sent accept requests to all nodes from 1 with value 0 sequence 5003
+&lt; --&gt; positive prepare response from 3 sequence 5003 recorded by 3 with no value
+&lt; {0 0 0}{0 0 0}{0 0 0}{0 0 0}{0 0 0}{0 0 0}
+\ No newline at end of file
+---
+&gt; --&gt; valid prepare vote ignored by 3 because round is already resolved
+&gt; --&gt; accept request from 3 with value 33333 sequence 5003 accepted by 3
+&gt; --&gt; accept request from 3 with value 33333 sequence 5003 accepted by 1
+&gt; --&gt; note: consensus has been achieved
+&gt; --&gt; accept request from 3 with value 33333 sequence 5003 accepted by 2
+&gt; --&gt; prepare response from 3 sequence 5003 ignored as a duplicate by 3
+&gt; --&gt; positive accept response from 3 sequence 5003 recorded by 3
+&gt; --&gt; positive accept response from 1 sequence 5003 recorded by 3
+&gt; --&gt; accept round successful: 3 detected consensus with value 33333
+&gt; --&gt; sent decide requests to all nodes from 3 with value 33333
+&gt; --&gt; positive accept response from 2 sequence 5003 recorded by 3
+&gt; --&gt; valid accept vote ignored by 3 because round is already resolved
+&gt; --&gt; recording consensus value 33333 at 1
+&gt; --&gt; recording consensus value 33333 at 2
+&gt; --&gt; recording consensus value 33333 at 3
+
+</failure></testcase><testcase name="inputs/2-first-proposer-fails-second-takes-over.input" time="0.010676860809326172" status="failed"><failure type="failure">./a.out &lt; inputs/2-first-proposer-fails-second-takes-over.input
+
+!!! output is incorrect:
+diff inputs/2-first-proposer-fails-second-takes-over.actual inputs/2-first-proposer-fails-second-takes-over.expected4c4
+&lt; --&gt; prepare request from 1 sequence 5002 accepted by 2 with no value
+---
+&gt; --&gt; prepare request from 1 sequence 5001 accepted by 2 with no value
+6,10c6
+&lt; --&gt; positive prepare response from 2 sequence 5002 recorded by 1 with no value
+&lt; --&gt; sent accept requests to all nodes from 1 with value 0 sequence 5001
+&lt; --&gt; sent prepare requests to all nodes from 3 with sequence 5003
+&lt; --&gt; prepare request from 3 sequence 5003 accepted by 2 with no value
+&lt; --&gt; prepare request from 3 sequence 5003 accepted by 3 with no value
+---
+&gt; --&gt; positive prepare response from 2 sequence 5001 recorded by 1 with no value
+12,21d7
+&lt; --&gt; prepare round successful: 1 proposing its own value 11111
+&lt; --&gt; sent accept requests to all nodes from 3 with value 0 sequence 5003
+&lt; --&gt; sent accept requests to all nodes from 2 with value 0 sequence 5003
+&lt; {0 0 0}{0 0 0}{0 0 0}{0 0 0}--&gt; sent prepare requests to all nodes from 1 with sequence 5001
+&lt; --&gt; prepare request from 1 sequence 5001 accepted by 1 with no value
+&lt; --&gt; prepare request from 1 sequence 5003 accepted by 2 with no value
+&lt; --&gt; prepare request from 1 sequence 5003 accepted by 3 with no value
+&lt; --&gt; prepare response from 1 sequence 5001 ignored as a duplicate by 1
+&lt; --&gt; prepare round successful: 1 proposing its own value 11111
+&lt; --&gt; prepare round successful: 1 proposing its own value 11111
+23,24c9,50
+&lt; --&gt; sent accept requests to all nodes from 2 with value 0 sequence 5003
+&lt; {0 0 0}{0 0 0}{0 0 0}{0 0 0}{0 0 0}{0 0 0}
+\ No newline at end of file
+---
+&gt; --&gt; accept request from 1 with value 11111 sequence 5001 accepted by 1
+&gt; --&gt; accept request from 1 with value 11111 sequence 5001 accepted by 2
+&gt; --&gt; note: consensus has been achieved
+&gt; --&gt; sent prepare requests to all nodes from 3 with sequence 5003
+&gt; --&gt; prepare request from 3 sequence 5003 accepted by 2 with value 11111 sequence 5001
+&gt; --&gt; prepare request from 3 sequence 5003 accepted by 3 with no value
+&gt; --&gt; positive prepare response from 2 sequence 5003 recorded by 3 with value 11111 sequence 5001
+&gt; --&gt; positive prepare response from 3 sequence 5003 recorded by 3 with no value
+&gt; --&gt; prepare round successful: 3 proposing discovered value 11111 sequence 5001
+&gt; --&gt; sent accept requests to all nodes from 3 with value 11111 sequence 5003
+&gt; --&gt; accept request from 3 with value 11111 sequence 5003 accepted by 2
+&gt; --&gt; accept request from 3 with value 11111 sequence 5003 accepted by 3
+&gt; --&gt; note: consensus has been achieved
+&gt; --&gt; positive accept response from 2 sequence 5003 recorded by 3
+&gt; --&gt; positive accept response from 3 sequence 5003 recorded by 3
+&gt; --&gt; accept round successful: 3 detected consensus with value 11111
+&gt; --&gt; sent decide requests to all nodes from 3 with value 11111
+&gt; --&gt; recording consensus value 11111 at 2
+&gt; --&gt; recording consensus value 11111 at 3
+&gt; --&gt; sent prepare requests to all nodes from 1 with sequence 5011
+&gt; --&gt; prepare request from 1 sequence 5011 accepted by 1 with value 11111 sequence 5001
+&gt; --&gt; prepare request from 1 sequence 5011 accepted by 2 with value 11111 sequence 5003
+&gt; --&gt; prepare request from 1 sequence 5011 accepted by 3 with value 11111 sequence 5003
+&gt; --&gt; positive prepare response from 1 sequence 5011 recorded by 1 with value 11111 sequence 5001
+&gt; --&gt; positive prepare response from 2 sequence 5011 recorded by 1 with value 11111 sequence 5003
+&gt; --&gt; prepare round successful: 1 proposing discovered value 11111 sequence 5003
+&gt; --&gt; sent accept requests to all nodes from 1 with value 11111 sequence 5011
+&gt; --&gt; positive prepare response from 3 sequence 5011 recorded by 1 with value 11111 sequence 5003
+&gt; --&gt; valid prepare vote ignored by 1 because round is already resolved
+&gt; --&gt; accept request from 1 with value 11111 sequence 5011 accepted by 1
+&gt; --&gt; accept request from 1 with value 11111 sequence 5011 accepted by 2
+&gt; --&gt; note: consensus has been achieved
+&gt; --&gt; accept request from 1 with value 11111 sequence 5011 accepted by 3
+&gt; --&gt; positive accept response from 1 sequence 5011 recorded by 1
+&gt; --&gt; positive accept response from 2 sequence 5011 recorded by 1
+&gt; --&gt; accept round successful: 1 detected consensus with value 11111
+&gt; --&gt; sent decide requests to all nodes from 1 with value 11111
+&gt; --&gt; positive accept response from 3 sequence 5011 recorded by 1
+&gt; --&gt; valid accept vote ignored by 1 because round is already resolved
+&gt; --&gt; recording consensus value 11111 at 1
+&gt; --&gt; recording consensus value 11111 at 2
+&gt; --&gt; recording consensus value 11111 at 3
+
+</failure></testcase><testcase name="inputs/3-dualing-proposers.input" time="0.013247966766357422" status="failed"><failure type="failure">./a.out &lt; inputs/3-dualing-proposers.input
+
+!!! output is incorrect:
+diff inputs/3-dualing-proposers.actual inputs/3-dualing-proposers.expected4,7c4,7
+&lt; --&gt; prepare request from 1 sequence 5002 accepted by 2 with no value
+&lt; --&gt; prepare request from 1 sequence 5003 accepted by 3 with no value
+&lt; --&gt; prepare request from 1 sequence 5004 accepted by 4 with no value
+&lt; --&gt; prepare request from 1 sequence 5005 accepted by 5 with no value
+---
+&gt; --&gt; prepare request from 1 sequence 5001 accepted by 2 with no value
+&gt; --&gt; prepare request from 1 sequence 5001 accepted by 3 with no value
+&gt; --&gt; prepare request from 1 sequence 5001 accepted by 4 with no value
+&gt; --&gt; prepare request from 1 sequence 5001 accepted by 5 with no value
+11,13c11,13
+&lt; --&gt; prepare request from 2 sequence 5003 accepted by 3 with no value
+&lt; --&gt; prepare request from 2 sequence 5004 accepted by 4 with no value
+&lt; --&gt; prepare request from 2 sequence 5005 accepted by 5 with no value
+---
+&gt; --&gt; prepare request from 2 sequence 5002 accepted by 3 with no value
+&gt; --&gt; prepare request from 2 sequence 5002 accepted by 4 with no value
+&gt; --&gt; prepare request from 2 sequence 5002 accepted by 5 with no value
+15,16c15,16
+&lt; --&gt; positive prepare response from 2 sequence 5002 recorded by 1 with no value
+&lt; --&gt; positive prepare response from 3 sequence 5003 recorded by 1 with no value
+---
+&gt; --&gt; positive prepare response from 2 sequence 5001 recorded by 1 with no value
+&gt; --&gt; positive prepare response from 3 sequence 5001 recorded by 1 with no value
+17a18,63
+&gt; --&gt; sent accept requests to all nodes from 1 with value 11111 sequence 5001
+&gt; --&gt; positive prepare response from 4 sequence 5001 recorded by 1 with no value
+&gt; --&gt; valid prepare vote ignored by 1 because round is already resolved
+&gt; --&gt; positive prepare response from 5 sequence 5001 recorded by 1 with no value
+&gt; --&gt; valid prepare vote ignored by 1 because round is already resolved
+&gt; --&gt; accept request from 1 with value 11111 sequence 5001 rejected by 1
+&gt; --&gt; accept request from 1 with value 11111 sequence 5001 rejected by 2
+&gt; --&gt; accept request from 1 with value 11111 sequence 5001 rejected by 3
+&gt; --&gt; accept request from 1 with value 11111 sequence 5001 rejected by 4
+&gt; --&gt; accept request from 1 with value 11111 sequence 5001 rejected by 5
+&gt; --&gt; negative accept response from 1 sequence 5001 recorded by 1
+&gt; --&gt; negative accept response from 2 sequence 5001 recorded by 1
+&gt; --&gt; negative accept response from 3 sequence 5001 recorded by 1
+&gt; --&gt; accept round failed at 1, restarting
+&gt; --&gt; sent prepare requests to all nodes from 1 with sequence 5011
+&gt; --&gt; accept response from 4 sequence 5001 from the past ignored by 1
+&gt; --&gt; accept response from 5 sequence 5001 from the past ignored by 1
+&gt; --&gt; positive prepare response from 1 sequence 5002 recorded by 2 with no value
+&gt; --&gt; positive prepare response from 2 sequence 5002 recorded by 2 with no value
+&gt; --&gt; positive prepare response from 3 sequence 5002 recorded by 2 with no value
+&gt; --&gt; prepare round successful: 2 proposing its own value 22222
+&gt; --&gt; sent accept requests to all nodes from 2 with value 22222 sequence 5002
+&gt; --&gt; positive prepare response from 4 sequence 5002 recorded by 2 with no value
+&gt; --&gt; valid prepare vote ignored by 2 because round is already resolved
+&gt; --&gt; positive prepare response from 5 sequence 5002 recorded by 2 with no value
+&gt; --&gt; valid prepare vote ignored by 2 because round is already resolved
+&gt; --&gt; prepare request from 1 sequence 5011 accepted by 1 with no value
+&gt; --&gt; prepare request from 1 sequence 5011 accepted by 2 with no value
+&gt; --&gt; prepare request from 1 sequence 5011 accepted by 3 with no value
+&gt; --&gt; prepare request from 1 sequence 5011 accepted by 4 with no value
+&gt; --&gt; prepare request from 1 sequence 5011 accepted by 5 with no value
+&gt; --&gt; accept request from 2 with value 22222 sequence 5002 rejected by 1
+&gt; --&gt; accept request from 2 with value 22222 sequence 5002 rejected by 2
+&gt; --&gt; accept request from 2 with value 22222 sequence 5002 rejected by 3
+&gt; --&gt; accept request from 2 with value 22222 sequence 5002 rejected by 4
+&gt; --&gt; accept request from 2 with value 22222 sequence 5002 rejected by 5
+&gt; --&gt; negative accept response from 1 sequence 5002 recorded by 2
+&gt; --&gt; negative accept response from 2 sequence 5002 recorded by 2
+&gt; --&gt; negative accept response from 3 sequence 5002 recorded by 2
+&gt; --&gt; accept round failed at 2, restarting
+&gt; --&gt; sent prepare requests to all nodes from 2 with sequence 5012
+&gt; --&gt; accept response from 4 sequence 5002 from the past ignored by 2
+&gt; --&gt; accept response from 5 sequence 5002 from the past ignored by 2
+&gt; --&gt; positive prepare response from 1 sequence 5011 recorded by 1 with no value
+&gt; --&gt; positive prepare response from 2 sequence 5011 recorded by 1 with no value
+&gt; --&gt; positive prepare response from 3 sequence 5011 recorded by 1 with no value
+19,46c65,89
+&lt; --&gt; sent accept requests to all nodes from 1 with value 11111 sequence 5002
+&lt; --&gt; sent accept requests to all nodes from 2 with value 0 sequence 5002
+&lt; --&gt; sent accept requests to all nodes from 3 with value 0 sequence 5003
+&lt; --&gt; sent accept requests to all nodes from 4 with value 0 sequence 5004
+&lt; {0 0 0}{0 0 0}{0 0 0}{0 0 0}{0 0 0}--&gt; prepare round successful: 1 proposing its own value 11111
+&lt; --&gt; prepare round successful: 1 proposing its own value 11111
+&lt; --&gt; prepare round successful: 1 proposing its own value 11111
+&lt; --&gt; prepare round successful: 1 proposing its own value 11111
+&lt; --&gt; prepare round successful: 1 proposing its own value 11111
+&lt; --&gt; prepare request from 0 sequence 5002 accepted by 1 with no value
+&lt; --&gt; prepare request from 0 sequence 5002 accepted by 2 with no value
+&lt; --&gt; prepare request from 0 sequence 5003 accepted by 3 with no value
+&lt; --&gt; prepare request from 0 sequence 5004 accepted by 4 with no value
+&lt; --&gt; prepare request from 0 sequence 5005 accepted by 5 with no value
+&lt; --&gt; sent accept requests to all nodes from 1 with value 11111 sequence 5002
+&lt; --&gt; sent accept requests to all nodes from 2 with value 0 sequence 5002
+&lt; --&gt; sent accept requests to all nodes from 3 with value 0 sequence 5003
+&lt; --&gt; sent accept requests to all nodes from 4 with value 0 sequence 5004
+&lt; {0 0 0}{0 0 0}{0 0 0}{0 0 0}{0 0 0}--&gt; prepare round successful: 1 proposing its own value 11111
+&lt; --&gt; prepare response from 2 sequence 5002 ignored as a duplicate by 1
+&lt; --&gt; prepare round successful: 1 proposing its own value 11111
+&lt; --&gt; prepare response from 4 sequence 5004 ignored as a duplicate by 1
+&lt; --&gt; prepare response from 5 sequence 5005 ignored as a duplicate by 1
+&lt; --&gt; sent accept requests to all nodes from 1 with value 11111 sequence 5002
+&lt; --&gt; sent accept requests to all nodes from 2 with value 0 sequence 5002
+&lt; --&gt; sent accept requests to all nodes from 3 with value 0 sequence 5003
+&lt; --&gt; sent accept requests to all nodes from 4 with value 0 sequence 5004
+&lt; {0 0 0}{0 0 0}{0 0 0}{0 0 0}{0 0 0}{0 0 0}{0 0 0}{0 0 0}{0 0 0}{0 0 0}
+\ No newline at end of file
+---
+&gt; --&gt; sent accept requests to all nodes from 1 with value 11111 sequence 5011
+&gt; --&gt; positive prepare response from 4 sequence 5011 recorded by 1 with no value
+&gt; --&gt; valid prepare vote ignored by 1 because round is already resolved
+&gt; --&gt; positive prepare response from 5 sequence 5011 recorded by 1 with no value
+&gt; --&gt; valid prepare vote ignored by 1 because round is already resolved
+&gt; --&gt; accept request from 1 with value 11111 sequence 5011 accepted by 1
+&gt; --&gt; accept request from 1 with value 11111 sequence 5011 accepted by 2
+&gt; --&gt; accept request from 1 with value 11111 sequence 5011 accepted by 3
+&gt; --&gt; note: consensus has been achieved
+&gt; --&gt; accept request from 1 with value 11111 sequence 5011 accepted by 4
+&gt; --&gt; accept request from 1 with value 11111 sequence 5011 accepted by 5
+&gt; --&gt; positive accept response from 1 sequence 5011 recorded by 1
+&gt; --&gt; positive accept response from 2 sequence 5011 recorded by 1
+&gt; --&gt; positive accept response from 3 sequence 5011 recorded by 1
+&gt; --&gt; accept round successful: 1 detected consensus with value 11111
+&gt; --&gt; sent decide requests to all nodes from 1 with value 11111
+&gt; --&gt; positive accept response from 4 sequence 5011 recorded by 1
+&gt; --&gt; valid accept vote ignored by 1 because round is already resolved
+&gt; --&gt; positive accept response from 5 sequence 5011 recorded by 1
+&gt; --&gt; valid accept vote ignored by 1 because round is already resolved
+&gt; --&gt; recording consensus value 11111 at 1
+&gt; --&gt; recording consensus value 11111 at 2
+&gt; --&gt; recording consensus value 11111 at 3
+&gt; --&gt; recording consensus value 11111 at 4
+&gt; --&gt; recording consensus value 11111 at 5
+
+</failure></testcase></testsuite></testsuites>

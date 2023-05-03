@@ -1,0 +1,80 @@
+<html><head></head><body><h1>Introduction</h1>
+
+<p>In the previous exercise, we saw that there are two ways to write
+comments in Go: single-line comments that are preceded by <code>//</code>, and
+multiline comment blocks that are wrapped with <code>/*</code> and <code>*/</code>.</p>
+
+<h2>Documentation comments</h2>
+
+<p>In Go, comments play an important role in documenting code. They are
+used by the <code>godoc</code> command, which extracts these comments to create
+documentation about Go packages. A documentation comment should be a
+complete sentence that starts with the name of the thing being
+described and ends with a period.</p>
+
+<p>Comments should precede packages as well as exported identifiers,
+for example exported functions, methods, package variables,
+constants, and structs, which you will learn more about in the next
+exercises.</p>
+
+<p>A package-level variable can look like this:</p>
+
+<pre><code class="language-go">// TemperatureCelsius represents a certain temperature in degrees Celsius.
+var TemperatureCelsius float64
+</code></pre>
+
+<h2>Package comments</h2>
+
+<p>Package comments should be written directly before a package clause
+(<code>package x</code>) and begin with <code>Package x ...</code> like this:</p>
+
+<pre><code class="language-go">// Package kelvin provides tools to convert
+// temperatures to and from Kelvin.
+package kelvin
+</code></pre>
+
+<h2>Function comments</h2>
+
+<p>A function comment should be written directly before the function
+declaration. It should be a full sentence that starts with the
+function name. For example, an exported comment for the function
+<code>Calculate</code> should take the form <code>Calculate ...</code>. It should also
+explain what arguments the function takes, what it does with them,
+and what its return values mean, ending in a period):</p>
+
+<pre><code class="language-go">// CelsiusFreezingTemp returns an integer value equal to the
+// temperature at which water freezes in degrees Celsius.
+func CelsiusFreezingTemp() int {
+	return 0
+}
+</code></pre>
+
+<h1>Instructions</h1>
+
+<p>Being hired by a big weather forecast company, your job is to
+maintain their code base. Scrolling through the code, you find it
+hard to follow what the code is actually doing. Good thing you know
+just the right thing to do!</p>
+
+<h2>1. Document package weather</h2>
+
+<p>Write a package comment for <code>package weather</code> that describes its
+contents. The package comment should introduce the package and
+provide information relevant to the package as a whole.</p>
+
+<h2>2. Document the CurrentCondition variable</h2>
+
+<p>Write a comment for the package variable <code>CurrentCondition</code>.</p>
+
+<p>This should tell any user of the package what information the
+variable stores, and what they can do with it.</p>
+
+<h2>3. Document the CurrentLocation variable</h2>
+
+<p>Just like the previous step, write a comment for <code>CurrentLocation</code>.</p>
+
+<h2>4. Document the Forecast() function</h2>
+
+<p>Write a function comment for <code>Forecast()</code>. Your comments must
+describe what the function does, but not how it does it.</p>
+</body></html>

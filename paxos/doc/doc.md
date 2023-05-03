@@ -1,0 +1,4 @@
+In this step you should complete the rest of the protocol. If you
+built a good simulator structure in the previous step, you should be
+able to focus on the details of Paxos itself and it should be
+straightforward to add each new case.

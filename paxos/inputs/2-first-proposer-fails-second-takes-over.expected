@@ -1,0 +1,50 @@
+--> initialized 3 nodes
+--> sent prepare requests to all nodes from 1 with sequence 5001
+--> prepare request from 1 sequence 5001 accepted by 1 with no value
+--> prepare request from 1 sequence 5001 accepted by 2 with no value
+--> positive prepare response from 1 sequence 5001 recorded by 1 with no value
+--> positive prepare response from 2 sequence 5001 recorded by 1 with no value
+--> prepare round successful: 1 proposing its own value 11111
+--> sent accept requests to all nodes from 1 with value 11111 sequence 5001
+--> accept request from 1 with value 11111 sequence 5001 accepted by 1
+--> accept request from 1 with value 11111 sequence 5001 accepted by 2
+--> note: consensus has been achieved
+--> sent prepare requests to all nodes from 3 with sequence 5003
+--> prepare request from 3 sequence 5003 accepted by 2 with value 11111 sequence 5001
+--> prepare request from 3 sequence 5003 accepted by 3 with no value
+--> positive prepare response from 2 sequence 5003 recorded by 3 with value 11111 sequence 5001
+--> positive prepare response from 3 sequence 5003 recorded by 3 with no value
+--> prepare round successful: 3 proposing discovered value 11111 sequence 5001
+--> sent accept requests to all nodes from 3 with value 11111 sequence 5003
+--> accept request from 3 with value 11111 sequence 5003 accepted by 2
+--> accept request from 3 with value 11111 sequence 5003 accepted by 3
+--> note: consensus has been achieved
+--> positive accept response from 2 sequence 5003 recorded by 3
+--> positive accept response from 3 sequence 5003 recorded by 3
+--> accept round successful: 3 detected consensus with value 11111
+--> sent decide requests to all nodes from 3 with value 11111
+--> recording consensus value 11111 at 2
+--> recording consensus value 11111 at 3
+--> sent prepare requests to all nodes from 1 with sequence 5011
+--> prepare request from 1 sequence 5011 accepted by 1 with value 11111 sequence 5001
+--> prepare request from 1 sequence 5011 accepted by 2 with value 11111 sequence 5003
+--> prepare request from 1 sequence 5011 accepted by 3 with value 11111 sequence 5003
+--> positive prepare response from 1 sequence 5011 recorded by 1 with value 11111 sequence 5001
+--> positive prepare response from 2 sequence 5011 recorded by 1 with value 11111 sequence 5003
+--> prepare round successful: 1 proposing discovered value 11111 sequence 5003
+--> sent accept requests to all nodes from 1 with value 11111 sequence 5011
+--> positive prepare response from 3 sequence 5011 recorded by 1 with value 11111 sequence 5003
+--> valid prepare vote ignored by 1 because round is already resolved
+--> accept request from 1 with value 11111 sequence 5011 accepted by 1
+--> accept request from 1 with value 11111 sequence 5011 accepted by 2
+--> note: consensus has been achieved
+--> accept request from 1 with value 11111 sequence 5011 accepted by 3
+--> positive accept response from 1 sequence 5011 recorded by 1
+--> positive accept response from 2 sequence 5011 recorded by 1
+--> accept round successful: 1 detected consensus with value 11111
+--> sent decide requests to all nodes from 1 with value 11111
+--> positive accept response from 3 sequence 5011 recorded by 1
+--> valid accept vote ignored by 1 because round is already resolved
+--> recording consensus value 11111 at 1
+--> recording consensus value 11111 at 2
+--> recording consensus value 11111 at 3
