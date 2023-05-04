@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"hash/fnv"
 	"log"
+	"net"
 	"net/http"
+	"net/rpc"
 	"os"
 	"runtime"
 )
@@ -28,11 +30,27 @@ type Pair struct {
 }
 
 type Worker struct {
-	Address string
+	Address   string
 	Available bool
 }
 
-//functions for consistent file naming
+func call(address, method string, request, response interface{}) error {
+	client, err := rpc.DialHTTP("tcp", address)
+	if err != nil {
+		log.Printf("rpc.Dial: %v", err)
+		return err
+	}
+	defer client.Close()
+
+	if err = client.Call(method, request, response); err != nil {
+		log.Printf("!!!Client call to the method %s: %v!!!", method, err)
+		return err
+	}
+
+	return nil
+}
+
+// functions for consistent file naming
 func mapSourceFile(m int) string       { return fmt.Sprintf("map_%d_source.db", m) }
 func mapInputFile(m int) string        { return fmt.Sprintf("map_%d_input.db", m) }
 func mapOutputFile(m, r int) string    { return fmt.Sprintf("map_%d_output_%d.db", m, r) }
@@ -235,38 +253,46 @@ func master(client Interface) error {
 	}
 
 	//workers(predetermined addresses + availbility for tasks)
-	Worker worker_1 {Address: "localhost:8081",
-					Available: true}
+	worker_1 := Worker{Address: "localhost:8081",
+		Available: true}
 
-	Worker worker_2 {Address: "localhost:8082",
-					Available: true}
+	worker_2 := Worker{Address: "localhost:8082",
+		Available: true}
 
-	Worker worker_3 {Address: "localhost:8083",
-					Available: true}
+	worker_3 := Worker{Address: "localhost:8083",
+		Available: true}
 
 	workers := []Worker{worker_1, worker_2, worker_3}
 
 	//wait until the workers have been started up
 	var ready string
 	fmt.Print("press enter when the workers are ready")
-	fmt.scan(&ready)
-	_ := ready //discard ready, dont need the value
+	fmt.scan(&ready) //discard ready, dont need the value
+
+	for mt := range mapTasks {
+		worker := workers[0]
+		for i := 0; !worker.Available; i++ {
+			worker = workers[i]
+			if i == 2 {
+				i = 0
+			}
+		}
+	}
 
 	//send the map tasks to the workers
-
-	 reduceTasks := []*ReduceTask{}
-	 for i := 0; i < r; i++ {
-	 	fmt.Println("Creating reduce task", i)
-	 	rt := new(ReduceTask)
-	 	rt.M = m
-	 	rt.R = r
-	 	rt.N = i
-	 	for j := 0; j < m; j++ {
-	 		fmt.Println("	Appending", "http://localhost:8080/data/"+mapOutputFile(j, i), "to rt.SourceHosts")
-	 		rt.SourceHosts = append(rt.SourceHosts, "http://localhost:8080/data/"+mapOutputFile(j, i))
-	 	}
-	 	reduceTasks = append(reduceTasks, rt)
-	 }
+	reduceTasks := []*ReduceTask{}
+	for i := 0; i < r; i++ {
+		fmt.Println("Creating reduce task", i)
+		rt := new(ReduceTask)
+		rt.M = m
+		rt.R = r
+		rt.N = i
+		for j := 0; j < m; j++ {
+			fmt.Println("	Appending", "http://localhost:8080/data/"+mapOutputFile(j, i), "to rt.SourceHosts")
+			rt.SourceHosts = append(rt.SourceHosts, "http://localhost:8080/data/"+mapOutputFile(j, i))
+		}
+		reduceTasks = append(reduceTasks, rt)
+	}
 
 	for i, mt := range mapTasks {
 		fmt.Println("Calling mt.Process on: ", mt.SourceHost)
@@ -292,17 +318,46 @@ func master(client Interface) error {
 }
 
 func worker(client Interface) error {
+	runtime.GOMAXPROCS(1)
 
+	//startup the master server
+	fmt.Println("Server started")
+
+	address := "localhost:8080"
+	tempdir := "./tmp" + "8080"
+	go func() {
+		http.Handle("/data/", http.StripPrefix("/data", http.FileServer(http.Dir(tempdir))))
+		if err := http.ListenAndServe(address, nil); err != nil {
+			log.Printf("Error in HTTP server for %s: %v", address, err)
+		}
+	}()
+	defer os.RemoveAll(tempdir)
+
+	mt := new(MapTask)
+	rt := new(ReduceTask)
+
+	rpc.Register(mt)
+	rpc.Register(rt)
+	rpc.HandleHTTP()
+	listener, err := net.Listen("tcp", ":"+port)
+	if err != nil {
+		log.Fatal("listen error: ", err)
+	}
+
+	if err := http.Serve(listener, nil); err != nil {
+		log.Fatalf("http.Serve: %v", err)
+	}
+
+	return nil
 }
 
 func Start(client Interface) error {
 	var _type string
-	master_addr := "localhost:8080"
 	fmt.Print("master or worker? ")
 	fmt.Scan(&_type)
-	switch (type) {
+	switch _type {
 	case "worker":
-		worker(master_addr, client)
+		worker(client)
 	case "master":
 		master(client)
 	}
