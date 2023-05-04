@@ -30,13 +30,13 @@ type Pair struct {
 }
 
 type Worker struct {
-	Address   string
-	Available bool
-	MapTasks []int
+	Address     string
+	Available   bool
+	MapTasks    []int
 	ReduceTasks []int
 }
 
-type Shutdown struct {}
+type Shutdown struct{}
 
 func call(address, method string, request, response interface{}) error {
 	client, err := rpc.DialHTTP("tcp", address)
@@ -69,11 +69,14 @@ type Interface interface {
 	Reduce(key string, values <-chan string, output chan<- Pair) error
 }
 
-func (shutdown *Shutdown) Quit(*args, *response) error {
+type EmptyInterface interface{}
+
+func (shutdown *Shutdown) Quit(args, response *int) error {
 	os.Exit(0)
+	return nil
 }
 
-func (task *MapTask) Process(tempdir string, client Interface) error {
+func (task *MapTask) Process(tempdir *string, client *Interface) error {
 	//TESTING
 	var count_pairs_pros, count_pairs_gen int
 
@@ -90,7 +93,7 @@ func (task *MapTask) Process(tempdir string, client Interface) error {
 	var output_dbs []*sql.DB
 	var outputFiles []string
 	for i := 0; i < task.R; i++ {
-		outputFile := tempdir + mapOutputFile(task.N, i)
+		outputFile := *tempdir + mapOutputFile(task.N, i)
 		outputFiles = append(outputFiles, outputFile)
 		createDatabase(outputFile)
 		odb, err := openDatabase(outputFile)
@@ -118,7 +121,7 @@ func (task *MapTask) Process(tempdir string, client Interface) error {
 			return err
 		}
 
-		go client.Map(key, value, output)
+		go (*client).Map(key, value, output)
 
 		for pair := range output {
 			count_pairs_gen += 1
@@ -146,7 +149,7 @@ func (task *MapTask) Process(tempdir string, client Interface) error {
 	return nil
 }
 
-func (task *ReduceTask) Process(tempdir string, client Interface) error {
+func (task *ReduceTask) Process(tempdir *string, client *Interface) error {
 	//TESTING
 	var count_keys, count_values, count_pairs int
 
@@ -159,7 +162,7 @@ func (task *ReduceTask) Process(tempdir string, client Interface) error {
 	fmt.Println("Merged databases")
 
 	//create (and open) the output database
-	outputFile := tempdir + reduceOutputFile(task.N)
+	outputFile := *tempdir + reduceOutputFile(task.N)
 	createDatabase(outputFile)
 	odb, err := openDatabase(outputFile)
 	if err != nil {
@@ -201,7 +204,7 @@ func (task *ReduceTask) Process(tempdir string, client Interface) error {
 			output = make(chan Pair, 100)
 			values = make(chan string, 100)
 			cur_key = key
-			go client.Reduce(cur_key, values, output)
+			go (*client).Reduce(cur_key, values, output)
 		}
 
 		//fmt.Println("Sent value", value)
@@ -229,7 +232,11 @@ func master(client Interface) error {
 	//startup the master server
 	fmt.Println("Server started")
 	address := "localhost:8080"
-	tempdir := "./tmp" + "8080"
+	tempdir := "./tmp" + "8080/"
+	err := os.MkdirAll(tempdir, 0755)
+	if err != nil {
+		log.Fatalf("Failed to make tmp dir", err)
+	}
 	go func() {
 		http.Handle("/data/", http.StripPrefix("/data", http.FileServer(http.Dir(tempdir))))
 		if err := http.ListenAndServe(address, nil); err != nil {
@@ -245,7 +252,7 @@ func master(client Interface) error {
 		MapPaths = append(MapPaths, tempdir+mapInputFile(i))
 		fmt.Println("	", tempdir+mapInputFile(i))
 	}
-	splitDatabase("./data/austen.db", MapPaths)
+	splitDatabase("./austen.db", MapPaths)
 
 	//create maptasks
 	m := 9
@@ -284,53 +291,59 @@ func master(client Interface) error {
 
 	//wait until the workers have been started up
 	var ready string
-	fmt.Print("press enter when the workers are ready")
-	fmt.scan(&ready) //discard ready, dont need the value
+	fmt.Print("press any character then enter when the workers are ready")
+	fmt.Scan(&ready) //discard ready, dont need the value
 
-	for mt := range mapTasks {
-		for i:=0; true; i++ {
-			worker = workers[i]
+	for _, mt := range mapTasks {
+		i := 0
+		for true {
+			fmt.Println("Looping through wokers", i)
+			worker := workers[i]
 			if worker.Available {
+				fmt.Println("Found available worker", i, "to work on map task", mt.N)
 				worker.Available = false
 				worker.MapTasks = append(worker.MapTasks, mt.N)
 				go func() {
-						var response []string
-						if err := call(worker.Address, "MapTask.Process", &mt, &response); err != nil {
-							log.Printf("error with call to MapTask.Process")
-						} 
-						worker.Available = true
-				}
-				for rt := range reduceTasks {
-					rt.SourceHosts = append(rt.SourceHosts, worker.Address + "/data/" + mapOutputFile(mt.N, rt.N))
+					var response []string
+					if err := call(worker.Address, "MapTask.Process", &mt, &response); err != nil {
+						log.Printf("error with call to MapTask.Process")
+					}
+					worker.Available = true
+				}()
+				for _, rt := range reduceTasks {
+					rt.SourceHosts = append(rt.SourceHosts, worker.Address+"/data/"+mapOutputFile(mt.N, rt.N))
 				}
 				break
 			}
 			if i == 2 {
 				i = -1
 			}
+			i += 1
 		}
 	}
 
 	for true {
+		fmt.Println("Checking if workers are available")
 		if workers[0].Available && workers[1].Available && workers[2].Available {
 			break
 		}
 	}
 
 	var reduceHosts []string
-	for rt := range reduceTasks {
-		for i:=0; true; i++ {
-			worker = workers[i]
+	for _, rt := range reduceTasks {
+		for i := 0; true; i++ {
+			worker := workers[i]
 			if worker.Available {
+				fmt.Println("Found available worker", i, "to work on reduce task", rt.N)
 				worker.Available = false
 				go func() {
-						var response []string
-						if err := call(worker.Address, "ReduceTask.Process", &rt, &response); err != nil {
-							log.Printf("error with call to ReduceTask.Process")
-						} 
-						worker.Available = true
-				}
-				reduceHosts = append(reduceHosts, worker.Address + "/data/" + reduceOutputFile(rt.N))
+					var response []string
+					if err := call(worker.Address, "ReduceTask.Process", &rt, &response); err != nil {
+						log.Printf("error with call to ReduceTask.Process")
+					}
+					worker.Available = true
+				}()
+				reduceHosts = append(reduceHosts, worker.Address+"/data/"+reduceOutputFile(rt.N))
 				break
 			}
 			if i == 2 {
@@ -338,9 +351,10 @@ func master(client Interface) error {
 			}
 		}
 	}
-	
+
 	mergeDatabases(reduceHosts, "final.db", "temp")
 
+	return nil
 }
 
 func worker(client Interface) error {
@@ -359,16 +373,39 @@ func worker(client Interface) error {
 	rpc.Register(quit)
 	rpc.Register(mt)
 	rpc.Register(rt)
-	address := "localhost:" + port
-	tempdir := "./tmp" + port
 
-	http.Handle("/data/", http.StripPrefix("/data", http.FileServer(http.Dir(tempdir))))
-	if err := http.ListenAndServe(address, nil); err != nil {
-		log.Printf("Error in HTTP server for %s: %v", address, err)
+	rpcAddr := "localhost:" + port
+	rpcListener, err := net.Listen("tcp", rpcAddr)
+	if err != nil {
+		log.Fatalf("Failed to listen for RPC connections: %v", err)
 	}
+	defer rpcListener.Close()
 
-	defer os.RemoveAll(tempdir)
-	return nil
+	fmt.Println("Listening for RPC connections at", rpcAddr)
+
+	go func() {
+		// Serve files using an HTTP server
+		httpAddr := "localhost:" + port
+		tempdir := "./tmp" + port
+		err := os.MkdirAll(tempdir, 0755)
+		if err != nil {
+			log.Fatalf("Failed to create temporary directory: %v", err)
+		}
+		http.Handle("/data/", http.StripPrefix("/data", http.FileServer(http.Dir(tempdir))))
+		fmt.Println("Serving files at http://" + httpAddr + "/data/")
+		if err := http.ListenAndServe(httpAddr, nil); err != nil {
+			log.Fatalf("Failed to start HTTP server: %v", err)
+		}
+	}()
+
+	for {
+		conn, err := rpcListener.Accept()
+		if err != nil {
+			log.Printf("Failed to accept RPC connection: %v", err)
+			continue
+		}
+		go rpc.ServeConn(conn)
+	}
 }
 
 func Start(client Interface) error {
