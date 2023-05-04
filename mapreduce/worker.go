@@ -32,7 +32,11 @@ type Pair struct {
 type Worker struct {
 	Address   string
 	Available bool
+	MapTasks []int
+	ReduceTasks []int
 }
+
+type Shutdown struct {}
 
 func call(address, method string, request, response interface{}) error {
 	client, err := rpc.DialHTTP("tcp", address)
@@ -63,6 +67,10 @@ func makeURL(host, file string) string { return fmt.Sprintf("http://%s/data/%s",
 type Interface interface {
 	Map(key, value string, output chan<- Pair) error
 	Reduce(key string, values <-chan string, output chan<- Pair) error
+}
+
+func (shutdown *Shutdown) Quit(*args, *response) error {
+	os.Exit(0)
 }
 
 func (task *MapTask) Process(tempdir string, client Interface) error {
@@ -252,6 +260,16 @@ func master(client Interface) error {
 		mapTasks = append(mapTasks, mt)
 	}
 
+	reduceTasks := []*ReduceTask{}
+	for i := 0; i < r; i++ {
+		fmt.Println("Creating reduce task", i)
+		rt := new(ReduceTask)
+		rt.M = m
+		rt.R = r
+		rt.N = i
+		reduceTasks = append(reduceTasks, rt)
+	}
+
 	//workers(predetermined addresses + availbility for tasks)
 	worker_1 := Worker{Address: "localhost:8081",
 		Available: true}
@@ -270,84 +288,86 @@ func master(client Interface) error {
 	fmt.scan(&ready) //discard ready, dont need the value
 
 	for mt := range mapTasks {
-		worker := workers[0]
-		for i := 0; !worker.Available; i++ {
+		for i:=0; true; i++ {
 			worker = workers[i]
+			if worker.Available {
+				worker.Available = false
+				worker.MapTasks = append(worker.MapTasks, mt.N)
+				go func() {
+						var response []string
+						if err := call(worker.Address, "MapTask.Process", &mt, &response); err != nil {
+							log.Printf("error with call to MapTask.Process")
+						} 
+						worker.Available = true
+				}
+				for rt := range reduceTasks {
+					rt.SourceHosts = append(rt.SourceHosts, worker.Address + "/data/" + mapOutputFile(mt.N, rt.N))
+				}
+				break
+			}
 			if i == 2 {
-				i = 0
+				i = -1
 			}
 		}
 	}
 
-	//send the map tasks to the workers
-	reduceTasks := []*ReduceTask{}
-	for i := 0; i < r; i++ {
-		fmt.Println("Creating reduce task", i)
-		rt := new(ReduceTask)
-		rt.M = m
-		rt.R = r
-		rt.N = i
-		for j := 0; j < m; j++ {
-			fmt.Println("	Appending", "http://localhost:8080/data/"+mapOutputFile(j, i), "to rt.SourceHosts")
-			rt.SourceHosts = append(rt.SourceHosts, "http://localhost:8080/data/"+mapOutputFile(j, i))
-		}
-		reduceTasks = append(reduceTasks, rt)
-	}
-
-	for i, mt := range mapTasks {
-		fmt.Println("Calling mt.Process on: ", mt.SourceHost)
-		if err := mt.Process(tempdir, client); err != nil {
-			log.Printf("Error in mt.Process with map worker", i)
+	for true {
+		if workers[0].Available && workers[1].Available && workers[2].Available {
+			break
 		}
 	}
 
-	for i, rt := range reduceTasks {
-		if err := rt.Process(tempdir, client); err != nil {
-			log.Printf("Error in rt.Process with reduce worker", i)
+	var reduceHosts []string
+	for rt := range reduceTasks {
+		for i:=0; true; i++ {
+			worker = workers[i]
+			if worker.Available {
+				worker.Available = false
+				go func() {
+						var response []string
+						if err := call(worker.Address, "ReduceTask.Process", &rt, &response); err != nil {
+							log.Printf("error with call to ReduceTask.Process")
+						} 
+						worker.Available = true
+				}
+				reduceHosts = append(reduceHosts, worker.Address + "/data/" + reduceOutputFile(rt.N))
+				break
+			}
+			if i == 2 {
+				i = -1
+			}
 		}
 	}
-
-	urls := []string{}
-	for i := 0; i < r; i++ {
-		fmt.Println("	Appending", "http://localhost:8080/data/"+reduceOutputFile(i), "to urls")
-		urls = append(urls, "http://localhost:8080/data/"+reduceOutputFile(i))
-	}
-
-	mergeDatabases(urls, "final.db", "temp")
+	
+	mergeDatabases(reduceHosts, "final.db", "temp")
 
 }
 
 func worker(client Interface) error {
 	runtime.GOMAXPROCS(1)
 
+	var port string
+	fmt.Print("Port Number? ")
+	fmt.Scan(&port)
+
 	//startup the master server
 	fmt.Println("Server started")
 
-	address := "localhost:8080"
-	tempdir := "./tmp" + "8080"
-	go func() {
-		http.Handle("/data/", http.StripPrefix("/data", http.FileServer(http.Dir(tempdir))))
-		if err := http.ListenAndServe(address, nil); err != nil {
-			log.Printf("Error in HTTP server for %s: %v", address, err)
-		}
-	}()
-	defer os.RemoveAll(tempdir)
-
 	mt := new(MapTask)
 	rt := new(ReduceTask)
-
+	quit := new(Shutdown)
+	rpc.Register(quit)
 	rpc.Register(mt)
 	rpc.Register(rt)
-	rpc.HandleHTTP()
-	listener, err := net.Listen("tcp", ":"+port)
-	if err != nil {
-		log.Fatal("listen error: ", err)
+	address := "localhost:" + port
+	tempdir := "./tmp" + port
+
+	http.Handle("/data/", http.StripPrefix("/data", http.FileServer(http.Dir(tempdir))))
+	if err := http.ListenAndServe(address, nil); err != nil {
+		log.Printf("Error in HTTP server for %s: %v", address, err)
 	}
 
-	if err := http.Serve(listener, nil); err != nil {
-		log.Fatalf("http.Serve: %v", err)
-	}
-
+	defer os.RemoveAll(tempdir)
 	return nil
 }
 
