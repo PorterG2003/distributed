@@ -27,6 +27,12 @@ type Pair struct {
 	Value string
 }
 
+type Worker struct {
+	Address string
+	Available bool
+}
+
+//functions for consistent file naming
 func mapSourceFile(m int) string       { return fmt.Sprintf("map_%d_source.db", m) }
 func mapInputFile(m int) string        { return fmt.Sprintf("map_%d_input.db", m) }
 func mapOutputFile(m, r int) string    { return fmt.Sprintf("map_%d_output_%d.db", m, r) }
@@ -194,9 +200,8 @@ func master(client Interface) error {
 
 	runtime.GOMAXPROCS(1)
 
+	//startup the master server
 	fmt.Println("Server started")
-
-	//setup server
 	address := "localhost:8080"
 	tempdir := "./tmp" + "8080"
 	go func() {
@@ -216,6 +221,7 @@ func master(client Interface) error {
 	}
 	splitDatabase("./data/austen.db", MapPaths)
 
+	//create maptasks
 	m := 9
 	r := 3
 	mapTasks := []*MapTask{}
@@ -228,20 +234,39 @@ func master(client Interface) error {
 		mapTasks = append(mapTasks, mt)
 	}
 
-	workers := []string{"localhost:8081", "localhost:8082", "localhost:8083"}
-	// reduceTasks := []*ReduceTask{}
-	// for i := 0; i < r; i++ {
-	// 	fmt.Println("Creating reduce task", i)
-	// 	rt := new(ReduceTask)
-	// 	rt.M = m
-	// 	rt.R = r
-	// 	rt.N = i
-	// 	for j := 0; j < m; j++ {
-	// 		fmt.Println("	Appending", "http://localhost:8080/data/"+mapOutputFile(j, i), "to rt.SourceHosts")
-	// 		rt.SourceHosts = append(rt.SourceHosts, "http://localhost:8080/data/"+mapOutputFile(j, i))
-	// 	}
-	// 	reduceTasks = append(reduceTasks, rt)
-	// }
+	//workers(predetermined addresses + availbility for tasks)
+	Worker worker_1 {Address: "localhost:8081",
+					Available: true}
+
+	Worker worker_2 {Address: "localhost:8082",
+					Available: true}
+
+	Worker worker_3 {Address: "localhost:8083",
+					Available: true}
+
+	workers := []Worker{worker_1, worker_2, worker_3}
+
+	//wait until the workers have been started up
+	var ready string
+	fmt.Print("press enter when the workers are ready")
+	fmt.scan(&ready)
+	_ := ready //discard ready, dont need the value
+
+	//send the map tasks to the workers
+
+	 reduceTasks := []*ReduceTask{}
+	 for i := 0; i < r; i++ {
+	 	fmt.Println("Creating reduce task", i)
+	 	rt := new(ReduceTask)
+	 	rt.M = m
+	 	rt.R = r
+	 	rt.N = i
+	 	for j := 0; j < m; j++ {
+	 		fmt.Println("	Appending", "http://localhost:8080/data/"+mapOutputFile(j, i), "to rt.SourceHosts")
+	 		rt.SourceHosts = append(rt.SourceHosts, "http://localhost:8080/data/"+mapOutputFile(j, i))
+	 	}
+	 	reduceTasks = append(reduceTasks, rt)
+	 }
 
 	for i, mt := range mapTasks {
 		fmt.Println("Calling mt.Process on: ", mt.SourceHost)
@@ -263,6 +288,7 @@ func master(client Interface) error {
 	}
 
 	mergeDatabases(urls, "final.db", "temp")
+
 }
 
 func worker(client Interface) error {
@@ -272,6 +298,7 @@ func worker(client Interface) error {
 func Start(client Interface) error {
 	var _type string
 	master_addr := "localhost:8080"
+	fmt.Print("master or worker? ")
 	fmt.Scan(&_type)
 	switch (type) {
 	case "worker":
