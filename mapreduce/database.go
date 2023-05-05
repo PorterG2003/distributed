@@ -136,6 +136,7 @@ func splitDatabase(source string, paths []string) error {
 }
 
 func mergeDatabases(urls []string, path string, temp string) (*sql.DB, error) {
+	fmt.Println("Tempfile is", temp)
 	// create the output file
 	db, err := createDatabase(path)
 	if err != nil {
